@@ -72,7 +72,7 @@ def main():
                     file_path = f"docs/{uploaded_file.name}"
                     upload_file_to_github(repo, file_path, "Upload document", file_content)
                     st.success("File uploaded successfully to GitHub.")
-                    construct_index(docs_directory_path)
+                    construct_index(docs_directory_path)  # Rebuild index with new document
 
     with st.container():
         st.header("Admin Page")
