@@ -1,0 +1,3 @@
+User: summarize the documents
+Chatbot response: 
+The documents contain the name and email of an individual.
