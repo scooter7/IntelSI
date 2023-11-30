@@ -4,17 +4,19 @@ from langchain.chat_models import ChatOpenAI
 from datetime import datetime
 import os
 from github import Github, GithubException
+import base64
+import json
 
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 github_client = Github(st.secrets["GITHUB_TOKEN"])
-repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
+repo = github_client.get_repo("scooter7/IntelSI")
 
 APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
 
 def is_email_approved(email):
     return email in APPROVED_EMAILS
 
-def upload_file_to_github(repo, file_path, message, file_content):
+def upload_file_to_github(file_path, message, file_content):
     try:
         contents = repo.get_contents(file_path)
         repo.update_file(file_path, message, file_content, contents.sha)
@@ -30,24 +32,32 @@ def construct_index(directory_path):
     llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.7, model_name="gpt-3.5-turbo", max_tokens=num_outputs))
     documents = SimpleDirectoryReader(directory_path).load_data()
     index = GPTSimpleVectorIndex(documents, llm_predictor=llm_predictor, prompt_helper=prompt_helper)
-    index.directory_path = directory_path
-    index.save_to_disk('index.json')
-    return index
+    index_json = json.dumps(index.to_dict())
+    upload_file_to_github("index.json", "Update index", index_json)
+
+def load_index_from_github():
+    try:
+        contents = repo.get_contents("index.json")
+        index_data = base64.b64decode(contents.content).decode('utf-8')
+        return GPTSimpleVectorIndex.from_dict(json.loads(index_data))
+    except GithubException:
+        st.error("Failed to load index from GitHub.")
+        return None
 
 def chatbot(input_text):
-    index = GPTSimpleVectorIndex.load_from_disk('index.json')
-    response = index.query(input_text, response_mode="compact")
-    content_dir = "content"
-    os.makedirs(content_dir, exist_ok=True)
-    filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.txt")
-    file_path = os.path.join(content_dir, filename)
-    with open(file_path, 'a') as f:
-        f.write(f"User: {input_text}\n")
-        f.write(f"Chatbot response: {response.response}\n")
-    with open(file_path, 'rb') as f:
-        contents = f.read()
-        repo.create_file(f"content/{filename}", f"Add chat file {filename}", contents)
-    return response.response
+    index = load_index_from_github()
+    if index:
+        response = index.query(input_text, response_mode="compact")
+        content_dir = "content"
+        os.makedirs(content_dir, exist_ok=True)
+        filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.txt")
+        file_path = os.path.join(content_dir, filename)
+        with open(file_path, 'a') as f:
+            f.write(f"User: {input_text}\n")
+            f.write(f"Chatbot response: {response.response}\n")
+        upload_file_to_github(f"content/{filename}", "Add chat file", open(file_path, 'rb').read())
+        return response.response
+    return "Error: Index not loaded."
 
 def main():
     st.title("Document Submission and Management App")
@@ -70,9 +80,9 @@ def main():
                 if submit_button and uploaded_file is not None:
                     file_content = uploaded_file.read()
                     file_path = f"docs/{uploaded_file.name}"
-                    upload_file_to_github(repo, file_path, "Upload document", file_content)
+                    upload_file_to_github(file_path, "Upload document", file_content)
                     st.success("File uploaded successfully to GitHub.")
-                    construct_index(docs_directory_path)  # Rebuild index with new document
+                    construct_index(docs_directory_path)
 
     with st.container():
         st.header("Admin Page")
