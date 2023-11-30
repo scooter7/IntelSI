@@ -1,0 +1,6 @@
+streamlit
+pandas
+PyGithub
+openai
+gpt_index
+langchain
