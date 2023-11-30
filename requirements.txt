@@ -7,3 +7,4 @@ langchain==0.0.134
 gpt-index==0.4.24
 PyPDF2
 python-docx
+docx2txt
