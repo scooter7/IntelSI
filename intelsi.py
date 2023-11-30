@@ -4,7 +4,7 @@ from github import Github, GithubException
 import openai
 import datetime
 
-APPROVED_EMAILS = ["user1@example.com", "user2@example.com"]
+APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
 github_token = st.secrets["GITHUB_TOKEN"]
 github_client = Github(github_token)
 repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
