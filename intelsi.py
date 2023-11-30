@@ -18,7 +18,7 @@ def is_email_approved(email):
     return email in APPROVED_EMAILS
 
 def upload_file_to_github(file_content, path, message):
-    repo.create_file(path, message, file_content)
+    repo.create_file(path, message, file_content.decode('ISO-8859-1'))
 
 def main():
     st.title("Document Submission and Management App")
@@ -36,7 +36,7 @@ def main():
                 uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
                 submit_button = st.form_submit_button(label='Submit')
                 if submit_button and uploaded_file is not None:
-                    file_content = uploaded_file.getvalue()
+                    file_content = uploaded_file.read()
                     upload_file_to_github(file_content, f"docs/{uploaded_file.name}", "Upload document")
                     st.success("File uploaded successfully to GitHub.")
         else:
