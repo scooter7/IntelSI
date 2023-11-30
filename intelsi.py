@@ -57,27 +57,22 @@ def main():
         st.header("User Submission")
         email = st.text_input("Enter your email address")
         
-        if email:
-            if is_email_approved(email):
-                with st.form(key='user_form'):
-                    first_name = st.text_input("First Name")
-                    last_name = st.text_input("Last Name")
-                    company_name = st.text_input("Company Name")
-                    phone_number = st.text_input("Phone Number")
-                    opportunity_name = st.text_input("Opportunity Name")
-                    uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
-                    submit_button = st.form_submit_button(label='Submit')
+        if email and is_email_approved(email):
+            with st.form(key='user_form'):
+                first_name = st.text_input("First Name")
+                last_name = st.text_input("Last Name")
+                company_name = st.text_input("Company Name")
+                phone_number = st.text_input("Phone Number")
+                opportunity_name = st.text_input("Opportunity Name")
+                uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
+                submit_button = st.form_submit_button(label='Submit')
 
-                    if submit_button and uploaded_file is not None:
-                        file_content = uploaded_file.read()
-                        file_path = f"docs/{uploaded_file.name}"
-                        upload_file_to_github(repo, file_path, "Upload document", file_content)
-                        st.success("File uploaded successfully to GitHub.")
-                        construct_index(docs_directory_path)
-            else:
-                st.warning("Your email address is not approved for submission.")
-        else:
-            st.info("Please enter your email address to proceed.")
+                if submit_button and uploaded_file is not None:
+                    file_content = uploaded_file.read()
+                    file_path = f"docs/{uploaded_file.name}"
+                    upload_file_to_github(repo, file_path, "Upload document", file_content)
+                    st.success("File uploaded successfully to GitHub.")
+                    construct_index(docs_directory_path)
 
     with st.container():
         st.header("Admin Page")
