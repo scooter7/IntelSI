@@ -5,6 +5,8 @@ import openai
 from datetime import datetime
 from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from langchain.chat_models import ChatOpenAI
+import os
+import textract
 
 APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
 github_token = st.secrets["GITHUB_TOKEN"]
@@ -21,6 +23,9 @@ def upload_file_to_github(file_content, path, message):
     except GithubException:
         repo.create_file(path, message, file_content)
 
+def extract_text_from_document(file_path):
+    return textract.process(file_path).decode('utf-8')
+
 def construct_index(directory_path):
     max_input_size = 4096
     num_outputs = 512
@@ -28,7 +33,13 @@ def construct_index(directory_path):
     chunk_size_limit = 600
     prompt_helper = PromptHelper(max_input_size, num_outputs, max_chunk_overlap, chunk_size_limit=chunk_size_limit)
     llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.7, model_name="gpt-3.5-turbo", max_tokens=num_outputs))
-    documents = SimpleDirectoryReader(directory_path).load_data()
+    
+    documents = []
+    for file_name in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, file_name)
+        text = extract_text_from_document(file_path)
+        documents.append(text)
+
     index = GPTSimpleVectorIndex(documents, llm_predictor=llm_predictor, prompt_helper=prompt_helper)
     index.directory_path = directory_path
     index.save_to_disk('index.json')
@@ -67,6 +78,7 @@ def main():
                     file_content = uploaded_file.read()
                     upload_file_to_github(file_content, f"docs/{uploaded_file.name}", "Upload document")
                     st.success("File uploaded successfully to GitHub.")
+                    construct_index("docs")
         else:
             st.warning("Your email address is not approved for submission.")
 
