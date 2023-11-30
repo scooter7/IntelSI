@@ -18,7 +18,13 @@ def is_email_approved(email):
     return email in APPROVED_EMAILS
 
 def upload_file_to_github(file_content, path, message):
-    repo.create_file(path, message, file_content.decode('ISO-8859-1'))
+    try:
+        contents = repo.get_contents(path)
+        # If file exists, update it
+        repo.update_file(path, message, file_content.decode('ISO-8859-1'), contents.sha)
+    except github.GithubException:
+        # If file does not exist, create it
+        repo.create_file(path, message, file_content.decode('ISO-8859-1'))
 
 def main():
     st.title("Document Submission and Management App")
