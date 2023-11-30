@@ -5,7 +5,6 @@ from datetime import datetime
 import os
 from github import Github
 
-# Set up OpenAI and GitHub
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 github_client = Github(st.secrets["GITHUB_TOKEN"])
 repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
@@ -50,13 +49,27 @@ def main():
     with st.container():
         st.header("User Submission")
         email = st.text_input("Enter your email address")
-        uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
-        if email and uploaded_file and is_email_approved(email):
-            if st.button('Submit'):
-                file_content = uploaded_file.read()
-                repo.create_file(f"docs/{uploaded_file.name}", "Upload document", file_content)
-                st.success("File uploaded successfully to GitHub.")
-                construct_index(docs_directory_path)
+        
+        if email:
+            if is_email_approved(email):
+                with st.form(key='user_form'):
+                    first_name = st.text_input("First Name")
+                    last_name = st.text_input("Last Name")
+                    company_name = st.text_input("Company Name")
+                    phone_number = st.text_input("Phone Number")
+                    opportunity_name = st.text_input("Opportunity Name")
+                    uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
+                    submit_button = st.form_submit_button(label='Submit')
+
+                    if submit_button and uploaded_file is not None:
+                        file_content = uploaded_file.read()
+                        repo.create_file(f"docs/{uploaded_file.name}", "Upload document", file_content)
+                        st.success("File uploaded successfully to GitHub.")
+                        construct_index(docs_directory_path)
+            else:
+                st.warning("Your email address is not approved for submission.")
+        else:
+            st.info("Please enter your email address to proceed.")
 
     with st.container():
         st.header("Admin Page")
