@@ -34,15 +34,14 @@ def construct_index(directory_path):
     index.save_to_disk('index.json')
     return index
 
-def chatbot(input_text, first_name, email):
+def chatbot(input_text):
     index = GPTSimpleVectorIndex.load_from_disk('index.json')
-    prompt = f"{first_name} ({email}): {input_text}"
-    response = index.query(prompt, response_mode="compact")
+    response = index.query(input_text, response_mode="compact")
     content_dir = "content"
-    filename = st.session_state.filename
+    filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.txt")
     file_path = f"{content_dir}/{filename}"
     with open(file_path, 'a') as f:
-        f.write(f"{first_name} ({email}): {input_text}\n")
+        f.write(f"User: {input_text}\n")
         f.write(f"Chatbot response: {response.response}\n")
     with open(file_path, 'rb') as f:
         contents = f.read()
@@ -78,26 +77,12 @@ def main():
             st.success("Authenticated as Admin.")
             st.subheader("Document Query and Analysis Interface")
             chat_container = st.container()
-            form = st.form(key="my_form", clear_on_submit=True)
-            if "first_send" in st.session_state and st.session_state.first_send:
-                first_name = form.text_input("Enter your first name:", key="first_name")
-                email = form.text_input("Enter your email address:", key="email")
-                st.session_state.first_send = False
-            else:
-                first_name = st.session_state.first_name
-                email = st.session_state.email
-            input_text = form.text_input("Enter your message:")
-            form_submit_button = form.form_submit_button(label="Send")
-            if form_submit_button and input_text:
-                filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S.docx")
-                st.session_state.filename = filename
-                response = chatbot(input_text, first_name, email)
+            input_text = st.text_input("Enter your query:")
+            if st.button("Send"):
+                response = chatbot(input_text)
                 with chat_container:
-                    st.write(f"{first_name}: {input_text}")
+                    st.write(f"User: {input_text}")
                     st.write(f"Chatbot: {response}")
-                st.session_state.first_name = first_name
-                st.session_state.email = email
-            form.empty()
         else:
             st.error("Incorrect password. Access denied.")
 
