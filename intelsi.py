@@ -1,15 +1,10 @@
 import streamlit as st
 import pandas as pd
-import os
-from github import Github
-import base64
-from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
-from langchain.chat_models import ChatOpenAI
+from github import Github, GithubException
 import openai
 import datetime
 
-APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
-
+APPROVED_EMAILS = ["user1@example.com", "user2@example.com"]
 github_token = st.secrets["GITHUB_TOKEN"]
 github_client = Github(github_token)
 repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
@@ -17,15 +12,11 @@ repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
 def is_email_approved(email):
     return email in APPROVED_EMAILS
 
-import base64
-
 def upload_file_to_github(file_content, path, message):
     try:
         contents = repo.get_contents(path)
-        # If file exists, update it
         repo.update_file(path, message, file_content, contents.sha)
-    except github.GithubException:
-        # If file does not exist, create it
+    except GithubException:
         repo.create_file(path, message, file_content)
 
 def main():
