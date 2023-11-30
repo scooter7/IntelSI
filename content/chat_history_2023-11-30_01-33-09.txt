@@ -1,0 +1,2 @@
+Query: summarize this doc
+Response: This document outlines the steps to be taken when a person dies, including contact emergency services, securing the body, and informing relevant authorities. It also explains the importance of personal safety and risk management for people involved in responding to the event. Finally, it includes information about who to contact and what questions to ask in order to take care of the deceased person's legal and financial matters.
