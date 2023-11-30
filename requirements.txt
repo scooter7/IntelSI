@@ -4,3 +4,4 @@ PyGithub
 openai
 gpt_index
 langchain
+gpt-index==0.4.24
