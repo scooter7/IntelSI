@@ -10,6 +10,11 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 github_client = Github(st.secrets["GITHUB_TOKEN"])
 repo = github_client.get_repo(st.secrets["GITHUB_REPO"])
 
+APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
+
+def is_email_approved(email):
+    return email in APPROVED_EMAILS
+
 def construct_index(directory_path):
     max_input_size = 4096
     num_outputs = 512
@@ -46,8 +51,8 @@ def main():
         st.header("User Submission")
         email = st.text_input("Enter your email address")
         uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx'])
-        if st.button('Submit'):
-            if uploaded_file is not None:
+        if email and uploaded_file and is_email_approved(email):
+            if st.button('Submit'):
                 file_content = uploaded_file.read()
                 repo.create_file(f"docs/{uploaded_file.name}", "Upload document", file_content)
                 st.success("File uploaded successfully to GitHub.")
