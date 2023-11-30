@@ -1,0 +1,3 @@
+User: what documents can you summarize?
+Chatbot response: 
+From the context information, it is possible to summarize the results from the cross tab analysis of the survey data. This includes the significant findings from the survey, such as the correlations between the overall rating and the other ten results, as well as the varying responses based on the subscriber's annual transaction count, whether the subscriber expanded, and respondent gender, age, job tenure, and preference for online versus offline.
