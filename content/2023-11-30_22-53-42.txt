@@ -1,0 +1,3 @@
+User: summarize all of the documents in the docs folder
+Chatbot response: 
+The documents in the docs folder contain a variety of information, ranging from instructions on how to use a particular software program to detailed descriptions of a product or service. The documents provide detailed information on topics such as installation, setup, troubleshooting, and maintenance. Additionally, the documents may include information on features, specifications, and other related topics.
