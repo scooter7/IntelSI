@@ -1,0 +1,3 @@
+User: describe the contents of each document in the docs folder
+Chatbot response: 
+The contents of the docs folder will depend on what has been saved in the folder. It could contain documents such as text files, spreadsheets, images, PDFs, and other types of documents.
