@@ -9,7 +9,7 @@ import openai
 import datetime
 
 # Authentication (Dummy list of approved emails for now)
-APPROVED_EMAILS = ["user1@example.com", "user2@example.com"]
+APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
 
 # Initialize GitHub client (assuming GitHub token is set in Streamlit secrets)
 github_token = st.secrets["GITHUB_TOKEN"]
