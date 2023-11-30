@@ -1,0 +1,3 @@
+User: summarize the documents in terms of subjects in each one
+Chatbot response: 
+The first document focuses on strategies for success with Slate forms, such as using reports and sources to track student conversions, appending a Person-GUID to pre-populate information, using hidden form fields to add fields, and capturing necessary data while building relationships with prospective students. The second document is about Carnegie's Slate CRM Optimization service and how to start a conversation with them.
