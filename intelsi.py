@@ -23,10 +23,10 @@ def upload_file_to_github(file_content, path, message):
     try:
         contents = repo.get_contents(path)
         # If file exists, update it
-        repo.update_file(path, message, base64.b64encode(file_content).decode(), contents.sha)
+        repo.update_file(path, message, file_content, contents.sha)
     except github.GithubException:
         # If file does not exist, create it
-        repo.create_file(path, message, base64.b64encode(file_content).decode())
+        repo.create_file(path, message, file_content)
 
 def main():
     st.title("Document Submission and Management App")
