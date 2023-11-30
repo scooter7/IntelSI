@@ -1,0 +1,18 @@
+User: please list the documents that you can query
+Chatbot response: 
+The documents that can be queried include: 
+- Motor Vehicle Records 
+- Title Histories 
+- State Taxes 
+- Business Searches 
+- Adoption Bills 
+- Unemployment Taxes 
+- Criminal History Checks 
+- Gun Permits 
+- Sex Offender Registry 
+- Vehicle Ownership 
+- Homestead Exemption 
+- License Plate Numbers 
+- Limited Criminal Background Checks 
+- State Repository for Criminal History Checks 
+- County Checks.
