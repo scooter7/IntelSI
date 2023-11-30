@@ -18,8 +18,7 @@ def is_email_approved(email):
     return email in APPROVED_EMAILS
 
 def upload_file_to_github(file_content, path, message):
-    content_base64 = base64.b64encode(file_content)
-    repo.create_file(path, message, content_base64.decode())
+    repo.create_file(path, message, file_content)
 
 def main():
     st.title("Document Submission and Management App")
