@@ -3,7 +3,7 @@ from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex,
 from langchain.chat_models import ChatOpenAI
 from datetime import datetime
 import os
-from github import Github
+from github import Github, GithubException
 
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 github_client = Github(st.secrets["GITHUB_TOKEN"])
@@ -13,6 +13,13 @@ APPROVED_EMAILS = ["james@shmooze.io", "james.vineburgh@magellaneducation.co"]
 
 def is_email_approved(email):
     return email in APPROVED_EMAILS
+
+def upload_file_to_github(repo, file_path, message, file_content):
+    try:
+        contents = repo.get_contents(file_path)
+        repo.update_file(file_path, message, file_content, contents.sha)
+    except GithubException:
+        repo.create_file(file_path, message, file_content)
 
 def construct_index(directory_path):
     max_input_size = 4096
@@ -63,7 +70,8 @@ def main():
 
                     if submit_button and uploaded_file is not None:
                         file_content = uploaded_file.read()
-                        repo.create_file(f"docs/{uploaded_file.name}", "Upload document", file_content)
+                        file_path = f"docs/{uploaded_file.name}"
+                        upload_file_to_github(repo, file_path, "Upload document", file_content)
                         st.success("File uploaded successfully to GitHub.")
                         construct_index(docs_directory_path)
             else:
