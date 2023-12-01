@@ -1,0 +1,2 @@
+User: can you list the files in the docs folder?
+Chatbot response: No, I cannot list the files in the docs folder as there is no mention or indication of any specific files or folders in the given context information.
