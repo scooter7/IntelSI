@@ -1,0 +1,2 @@
+User: what is the proposed cost?
+Chatbot response: The proposed cost is $52,500.
