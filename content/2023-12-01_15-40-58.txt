@@ -1,0 +1,2 @@
+User: all documents contain pricing. List the proposed prices
+Chatbot response: The proposed prices are not mentioned in the given context information.
