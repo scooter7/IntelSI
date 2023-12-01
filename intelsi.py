@@ -1,13 +1,14 @@
 import streamlit as st
+import os
+from datetime import datetime
+import base64
+import pickle
+from io import BytesIO
+from github import Github, GithubException
 from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from langchain.chat_models import ChatOpenAI
-from datetime import datetime
-import os
-from github import Github, GithubException
-import base64
-import json
 
-openai_api_key = st.secrets["OPENAI_API_KEY"]
+# Initialize GitHub client
 github_client = Github(st.secrets["GITHUB_TOKEN"])
 repo = github_client.get_repo("scooter7/IntelSI")
 
@@ -31,21 +32,28 @@ def construct_index(directory_path):
     prompt_helper = PromptHelper(max_input_size, num_outputs, max_chunk_overlap, chunk_size_limit=chunk_size_limit)
     llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.7, model_name="gpt-3.5-turbo", max_tokens=num_outputs))
     documents = SimpleDirectoryReader(directory_path).load_data()
-    index = GPTSimpleVectorIndex(documents, llm_predictor=llm_predictor, prompt_helper=prompt_helper)
-    index_json = json.dumps(index.to_dict())
-    upload_file_to_github("index.json", "Update index", index_json)
+    return GPTSimpleVectorIndex(documents, llm_predictor=llm_predictor, prompt_helper=prompt_helper)
 
-def load_index_from_github():
+def serialize_index_to_github(index, github_path):
+    byte_stream = BytesIO()
+    pickle.dump(index, byte_stream)
+    byte_stream.seek(0)
+    encoded_content = base64.b64encode(byte_stream.read()).decode()
+    upload_file_to_github(github_path, "Update index", encoded_content)
+
+def load_index_from_github(github_path):
     try:
-        contents = repo.get_contents("index.json")
-        index_data = base64.b64decode(contents.content).decode('utf-8')
-        return GPTSimpleVectorIndex.from_dict(json.loads(index_data))
-    except GithubException:
-        st.error("Failed to load index from GitHub.")
+        contents = repo.get_contents(github_path)
+        encoded_content = contents.content
+        decoded_content = base64.b64decode(encoded_content)
+        byte_stream = BytesIO(decoded_content)
+        return pickle.load(byte_stream)
+    except GithubException as e:
+        st.error("Error loading index from GitHub: " + str(e))
         return None
 
 def chatbot(input_text):
-    index = load_index_from_github()
+    index = load_index_from_github('index.pkl')
     if index:
         response = index.query(input_text, response_mode="compact")
         content_dir = "content"
@@ -82,7 +90,8 @@ def main():
                     file_path = f"docs/{uploaded_file.name}"
                     upload_file_to_github(file_path, "Upload document", file_content)
                     st.success("File uploaded successfully to GitHub.")
-                    construct_index(docs_directory_path)
+                    index = construct_index(docs_directory_path)
+                    serialize_index_to_github(index, 'index.pkl')
 
     with st.container():
         st.header("Admin Page")
