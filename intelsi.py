@@ -3,6 +3,7 @@ from datetime import datetime
 from github import Github, GithubException
 from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from langchain.chat_models import ChatOpenAI
+import os
 
 github_client = Github(st.secrets["GITHUB_TOKEN"])
 repo = github_client.get_repo("scooter7/IntelSI")
